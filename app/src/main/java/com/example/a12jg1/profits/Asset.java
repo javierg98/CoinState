@@ -10,6 +10,7 @@ import java.util.Date;
 
 public class Asset {
     private String id;
+    private String name;
     private String symbol;
     private String imageUrl;
     private int rank;
@@ -19,9 +20,10 @@ public class Asset {
     private String dateBought;
     private String graphUrl;
 
-    public Asset(String id, String symbol, int rank, int currentValue, int coinsOwned, int priceBought, String dateBought){
+    public Asset(String id, String name, String symbol, int rank, int currentValue, int coinsOwned, int priceBought, String dateBought){
 
         this.id = id;
+        this.name = name;
         this.symbol = symbol;
         this.imageUrl = "";
         this.rank = rank;
@@ -34,6 +36,8 @@ public class Asset {
     }
 
     public String getId() {return id;}
+
+    public String getName(){return name;}
 
     public String getSymbol() {return symbol;}
 

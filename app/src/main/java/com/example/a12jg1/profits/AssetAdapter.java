@@ -9,7 +9,16 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.ValueEventListener;
+
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 
 import it.sephiroth.android.library.picasso.Picasso;
 
@@ -19,9 +28,75 @@ import it.sephiroth.android.library.picasso.Picasso;
 
 public class AssetAdapter extends RecyclerView.Adapter<AssetAdapter.ViewHolder>{
 
+
+    public ArrayList<Asset> assets = new ArrayList<>();
+    public ArrayList<String> assetKeys = new ArrayList<>();
+
     public static final String ASSET = "ASSET";
 
-    ArrayList<Asset> assets;
+    public static final String PROFILE_ACTIVITY = "profile";
+    public static final String POPULAR_ACTIVITY = "popular";
+
+    public FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+    public String uid = user.getUid();
+
+    public DatabaseReference assetReference;
+
+    public AssetAdapter(final DatabaseReference assetRef, final String requestedActivity) {
+
+        this.assetReference = assetRef;
+        assetReference.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+
+
+
+                //populate the list of items for the other activities
+                //REMOVE
+                //reimpliment for filtering later
+//                if (requestedActivity.equals(PROFILE_ACTIVITY)){
+//                    for (DataSnapshot post : dataSnapshot.getChildren()) {
+//                        Asset p = post.getValue(Asset.class);
+//                        if (p.getId().equals(uid)){
+//                            assets.add(p);
+//                            assetKeys.add(post.getKey());
+//                            Log.d("Testing", p.getName());
+//                        }
+//                    }
+//                }
+//                else if(requestedActivity.equals(POPULAR_ACTIVITY)){
+//                    for (DataSnapshot post : dataSnapshot.getChildren()) {
+//                        Asset p = post.getValue(Asset.class);
+//                        assets.add(p);
+//                        pollKeys.add(post.getKey());
+//                        Log.d("Testing", p.getTitle());
+//                    }
+//
+//                    Collections.sort(assets, new Comparator<Poll>() {
+//                        @Override
+//                        public int compare(Poll poll, Poll t1) {
+//                            return t1.compareTo(poll);
+//                        }
+//                    });
+//
+//                }
+                //else{
+                    for (DataSnapshot post : dataSnapshot.getChildren()) {
+                        Asset p = post.getValue(Asset.class);
+                        assets.add(p);
+                        assetKeys.add(post.getKey());
+                        Log.d("Testing", p.getId());
+                    }
+                //}
+                notifyDataSetChanged();
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+                Log.d("CANCELLED", "Did not get poll");
+            }
+        });
+    }
 
     /**
      * This function is called only enough times to cover the screen with views.  After
@@ -31,11 +106,10 @@ public class AssetAdapter extends RecyclerView.Adapter<AssetAdapter.ViewHolder>{
      * @return the new ViewHolder we allocate
      */
     @Override
-    public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+    public AssetViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         // a LayoutInflater turns a layout XML resource into a View object.
-        final View movieListItem = LayoutInflater.from(parent.getContext()).
-                inflate(R.layout.asset_list_item, parent, false);
-        return new ViewHolder(movieListItem);
+        final View assetListItem = LayoutInflater.from(parent.getContext()).inflate(R.layout.asset_list_item, parent, false);
+        return new AssetViewHolder(assetListItem);
     }
 
     /**
@@ -46,7 +120,7 @@ public class AssetAdapter extends RecyclerView.Adapter<AssetAdapter.ViewHolder>{
      * @param position the index into the array of movieArticles
      */
     @Override
-    public void onBindViewHolder(ViewHolder holder, int position) {
+    public void onBindViewHolder(AssetViewHolder holder, int position) {
         final Asset asset = assets.get(position);
 
         holder.coinView.setText(asset.getId());
@@ -58,19 +132,21 @@ public class AssetAdapter extends RecyclerView.Adapter<AssetAdapter.ViewHolder>{
                 .load(coinImageUrl).into(holder.imageView);
 
         // Attach a click listener that launches a new Activity
-        holder.view.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-
-
-                // Code for launching an Explicit Intent to go to another Activity in
-                // the same App.
-                Intent intent = new Intent(v.getContext(), DetailActivity.class);
-                intent.putExtra(ASSET, asset);
-
-                v.getContext().startActivity(intent);
-            }
-        });
+//        holder.view.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//
+//
+//                // Code for launching an Explicit Intent to go to another Activity in
+//                // the same App.
+//                Intent intent = new Intent(v.getContext(), DetailActivity.class);
+//                intent.putExtra(ASSET, asset);
+//
+//                v.getContext().startActivity(intent);
+//            }
+//        });
+        View.OnClickListener listener = new itemClicks(asset, holder, uid, position);
+        holder.view.setOnClickListener(listener);
 
     }
 
@@ -84,11 +160,35 @@ public class AssetAdapter extends RecyclerView.Adapter<AssetAdapter.ViewHolder>{
         return assets.size();
     }
 
+    private class itemClicks implements View.OnClickListener{
+
+        private Asset asset;
+        private AssetViewHolder holder;
+        private String uid;
+        private int position;
+
+        public itemClicks(Asset asset, AssetViewHolder holder, String uid, int position){
+            this.asset = asset;
+            this.holder = holder;
+            this.uid = uid;
+            this.position = position;
+        }
+
+        @Override
+        public void onClick(View view) {
+            Intent intent = new Intent(view.getContext(), DetailActivity.class);
+            view.getContext().startActivity(intent);
+        }
+
+
+
+    }
+
     /**
      * A ViewHolder class for our adapter that 'caches' the references to the
      * subviews, so we don't have to look them up each time.
      */
-    public static class ViewHolder extends RecyclerView.ViewHolder {
+    public static class AssetViewHolder extends RecyclerView.ViewHolder{
 
         public View view;
         public TextView coinView;
@@ -96,13 +196,14 @@ public class AssetAdapter extends RecyclerView.Adapter<AssetAdapter.ViewHolder>{
         public TextView changeView;
         public ImageView imageView;
 
-        public ViewHolder(View itemView) {
+        public AssetViewHolder(View itemView) {
             super(itemView);
             view = itemView;
-            coinView = (TextView) itemView.findViewById(R.id.coinTextView);
-            priceView = (TextView) itemView.findViewById(R.id.priceView);
-            changeView = (TextView) itemView.findViewById(R.id.changeView);
-            imageView = (ImageView) itemView.findViewById(R.id.imageView);
+
+            this.coinView = (TextView) itemView.findViewById(R.id.coinTextView);
+            this.priceView = (TextView) itemView.findViewById(R.id.priceView);
+            this.changeView = (TextView) itemView.findViewById(R.id.changeView);
+            this.imageView = (ImageView) itemView.findViewById(R.id.imageView);
         }
     }
 }

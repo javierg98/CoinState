@@ -9,8 +9,6 @@ import android.os.Bundle;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.squareup.picasso.Picasso;
-
 import static android.R.attr.author;
 
 public class DetailActivity extends AppCompatActivity {

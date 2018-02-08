@@ -48,7 +48,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
     private FirebaseAuth mFirebaseAuth;
     private FirebaseUser mFirebaseUser;
 
-    private DatabaseReference mPollCreationReference;
+    private DatabaseReference mAssetCreationReference;
     private RecyclerView mRecyclerView;
     private FirebaseDatabase mDatabase;
     private GoogleApiClient mGoogleApiClient;
@@ -76,26 +76,24 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
                 .build();
 
         mDatabase = FirebaseDatabase.getInstance();
-        mPollCreationReference = mDatabase.getReference("poll");
+        mAssetCreationReference = mDatabase.getReference("asset");
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-        //FAB handles the launching of a poll creation activity
+        //FAB handles the launching of an Asset creation activity
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intent = new Intent(view.getContext(), CoinAddActivity.class);
+                Intent intent = new Intent(view.getContext(), AssetAddActivity.class);
                 view.getContext().startActivity(intent);
                 finish();
             }
         });
 
-        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
-        navigationView.setNavigationItemSelectedListener(this);
         mRecyclerView = (RecyclerView) findViewById(R.id.recycler_view);
 
-        AssetAdapter mAdapter = new AssetAdapter(mPollCreationReference, MAIN_ACTIVITY);
+        AssetAdapter mAdapter = new AssetAdapter(mAssetCreationReference, MAIN_ACTIVITY);
         mRecyclerView.setAdapter(mAdapter);
         mRecyclerView.setLayoutManager(new LinearLayoutManager(this));
     }
