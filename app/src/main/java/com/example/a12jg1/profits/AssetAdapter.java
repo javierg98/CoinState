@@ -28,7 +28,6 @@ import it.sephiroth.android.library.picasso.Picasso;
 
 public class AssetAdapter extends RecyclerView.Adapter<AssetAdapter.ViewHolder>{
 
-
     public ArrayList<Asset> assets = new ArrayList<>();
     public ArrayList<String> assetKeys = new ArrayList<>();
 
@@ -106,11 +105,17 @@ public class AssetAdapter extends RecyclerView.Adapter<AssetAdapter.ViewHolder>{
      * @return the new ViewHolder we allocate
      */
     @Override
-    public AssetViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+    public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         // a LayoutInflater turns a layout XML resource into a View object.
         final View assetListItem = LayoutInflater.from(parent.getContext()).inflate(R.layout.asset_list_item, parent, false);
-        return new AssetViewHolder(assetListItem);
+        return new ViewHolder(assetListItem);
     }
+//    Issue with object being passed in to onBindViewHolder. We want to pass assetViewHolder
+    //However we need an AsserAdapter.ViewHolder
+//    @Override
+//    public void onBindViewHolder(AssetAdapter.ViewHolder holder, int position) {
+//
+//    }
 
     /**
      * This function gets called each time a ViewHolder needs to hold data for a different
@@ -120,7 +125,7 @@ public class AssetAdapter extends RecyclerView.Adapter<AssetAdapter.ViewHolder>{
      * @param position the index into the array of movieArticles
      */
     @Override
-    public void onBindViewHolder(AssetViewHolder holder, int position) {
+    public void onBindViewHolder(ViewHolder holder, int position) {
         final Asset asset = assets.get(position);
 
         holder.coinView.setText(asset.getId());
@@ -163,11 +168,11 @@ public class AssetAdapter extends RecyclerView.Adapter<AssetAdapter.ViewHolder>{
     private class itemClicks implements View.OnClickListener{
 
         private Asset asset;
-        private AssetViewHolder holder;
+        private ViewHolder holder;
         private String uid;
         private int position;
 
-        public itemClicks(Asset asset, AssetViewHolder holder, String uid, int position){
+        public itemClicks(Asset asset, ViewHolder holder, String uid, int position){
             this.asset = asset;
             this.holder = holder;
             this.uid = uid;
@@ -188,7 +193,7 @@ public class AssetAdapter extends RecyclerView.Adapter<AssetAdapter.ViewHolder>{
      * A ViewHolder class for our adapter that 'caches' the references to the
      * subviews, so we don't have to look them up each time.
      */
-    public static class AssetViewHolder extends RecyclerView.ViewHolder{
+    public static class ViewHolder extends RecyclerView.ViewHolder{
 
         public View view;
         public TextView coinView;
@@ -196,7 +201,7 @@ public class AssetAdapter extends RecyclerView.Adapter<AssetAdapter.ViewHolder>{
         public TextView changeView;
         public ImageView imageView;
 
-        public AssetViewHolder(View itemView) {
+        public ViewHolder(View itemView) {
             super(itemView);
             view = itemView;
 

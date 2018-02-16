@@ -78,8 +78,10 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
         mDatabase = FirebaseDatabase.getInstance();
         mAssetCreationReference = mDatabase.getReference("asset");
 
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
+        //Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        //setSupportActionBar(toolbar);
+
+
         //FAB handles the launching of an Asset creation activity
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {

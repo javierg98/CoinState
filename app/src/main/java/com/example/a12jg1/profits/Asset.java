@@ -55,6 +55,4 @@ public class Asset {
 
     public String getGraphUrl() {return graphUrl;}
 
-
-
 }
